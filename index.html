@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記承天寺夜遊 - 月下解謎</title>
+    <!-- 引入華麗的古典字體 (Noto Serif TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --gold-light: #FCE19B;
+            --gold-dark: #B8860B;
+            --night-blue: #0A0F24;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Noto Serif TC', serif;
+            background-color: var(--night-blue);
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 載入您提供的圖片，並加上深藍色漸層營造夜晚華麗感 */
+            background-image: 
+                linear-gradient(135deg, rgba(10, 15, 36, 0.8) 0%, rgba(20, 10, 40, 0.6) 100%),
+                url('承天寺.jfif');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            /* 讓背景稍微模糊，凸顯前景文字 */
+            filter: blur(2px) brightness(0.8);
+            transform: scale(1.05); /* 避免模糊邊緣露白 */
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 3s ease-in-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .title-text {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            background: linear-gradient(to bottom, #FFFDE4, var(--gold-light), var(--gold-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(252, 225, 155, 0.4);
+            margin-bottom: 1rem;
+            writing-mode: horizontal-tb;
+        }
+        
+        @media (max-width: 768px) {
+            .title-text {
+                font-size: 3.5rem;
+                writing-mode: vertical-rl;
+                letter-spacing: 0.5em;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--gold-light);
+            letter-spacing: 0.3em;
+            margin-bottom: 3rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            opacity: 0.9;
+        }
+
+        .start-btn {
+            background: transparent;
+            border: 2px solid var(--gold-light);
+            color: var(--gold-light);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Noto Serif TC', serif;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 15px rgba(252, 225, 155, 0.2), inset 0 0 10px rgba(252, 225, 155, 0.1);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn:hover {
+            background: rgba(252, 225, 155, 0.2);
+            box-shadow: 0 0 25px rgba(252, 225, 155, 0.6), inset 0 0 20px rgba(252, 225, 155, 0.4);
+            text-shadow: 0 0 10px #fff;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dialog-box {
+            display: none;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid var(--gold-dark);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(184, 134, 11, 0.3);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            color: #eee;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: left;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="bg-layer"></div>
+        <canvas id="particle-canvas"></canvas>
+
+        <div class="ui-layer" id="main-menu">
+            <h1 class="title-text">記承天寺夜遊</h1>
+            <div class="subtitle">月光如水・竹柏解謎</div>
+            <button class="start-btn" onclick="startGame()">踏月而行</button>
+        </div>
+
+        <div class="dialog-box" id="scene1-dialog">
+            <p id="dialog-text">元豐六年十月十二日夜，解衣欲睡，月色入戶，欣然起行。<br><br>這月色...似乎藏著某種指引。</p>
+            <div class="mt-6 flex justify-end">
+                <button class="start-btn" style="padding: 8px 20px; font-size: 1rem;" onclick="nextScene()">尋找張懷民</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.5 - 0.1; // Float upwards
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.glow = Math.random() > 0.8 ? true : false;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(252, 225, 155, ${this.opacity})`;
+                if (this.glow) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#FCE19B';
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = () => {
+            initParticles();
+            animate();
+        };
+
+        function startGame() {
+            const menu = document.getElementById('main-menu');
+            const dialog = document.getElementById('scene1-dialog');
+            
+            // Fade out menu
+            menu.style.transition = "opacity 1s";
+            menu.style.opacity = 0;
+            
+            setTimeout(() => {
+                menu.style.display = "none";
+                // Show dialog
+                dialog.style.display = "block";
+                dialog.style.animation = "fadeIn 1.5s ease-in-out forwards";
+            }, 1000);
+        }
+
+        function nextScene() {
+            const dialogText = document.getElementById('dialog-text');
+            dialogText.innerHTML = "念無與為樂者，遂至承天寺尋張懷民。<br>懷民亦未寢，相與步於中庭。<br><br><span style='color:var(--gold-light); font-size:0.9em;'>(前方庭院的大門被一道機關鎖住...)</span>";
+            // TODO: 切換到解謎畫面
+            const btn = document.querySelector('#scene1-dialog button');
+            btn.innerText = "查看機關";
+            btn.onclick = () => {
+                alert("即將進入第一道謎題：月影推盤（開發中）\n您可以與 AI 討論接下來的謎題設計！");
+            };
+        }
+    </script>
+</body>
+</html>
